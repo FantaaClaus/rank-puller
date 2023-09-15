@@ -1,0 +1,118 @@
+import requests
+import sqlite3
+
+# API endpoint URL
+api_url = "https://api.example.com/player_data"
+
+# Database connection
+conn = sqlite3.connect("player_data.db")
+cursor = conn.cursor()
+
+# Create the table if it doesn't exist
+cursor.execute("""
+    CREATE TABLE IF NOT EXISTS player_data (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        username TEXT NOT NULL,
+        platform TEXT NOT NULL,
+        rank_2s INTEGER,
+        rank_3s INTEGER
+    )
+""")
+conn.commit()
+
+# Make the API request
+response = requests.get(api_url)
+
+if response.status_code == 200:
+    data = response.json()
+
+    # Iterate through the API data and insert it into the database
+    for entry in data:
+        username = entry["username"]
+        platform = entry["platform"]
+        rank_2s = entry["rank_2s"]
+        rank_3s = entry["rank_3s"]
+
+        # Insert the data into the database
+        cursor.execute("""
+            INSERT INTO player_data (username, platform, rank_2s, rank_3s)
+            VALUES (?, ?, ?, ?)
+        """, (username, platform, rank_2s, rank_3s))
+        conn.commit()
+
+    print("Data successfully fetched and stored in the database.")
+
+else:
+    print(f"Failed to fetch data from the API. Status code: {response.status_code}")
+
+# Close the database connection
+conn.close()
+This script assumes that the API you are working with returns data in JSON format with fields for username, platform, rank_2s, and rank_3s. Make sure to replace api_url with the actual API endpoint you want to use and adjust the database connection details accordingly.
+
+Remember to install the required Python libraries using pip install requests and pip install sqlite3 if you haven't already. Also, replace the database connection details with your own if you're using a different database system.
+
+
+
+
+User
+please implement this api key into the code above: 74d6943a-6c9f-4db4-86b7-b75101d5a8ca
+ChatGPT
+To include an API key in your requests to the API, you can add an "Authorization" header to the request with the API key value. Here's the modified Python script with the API key included:
+
+python
+Copy code
+import requests
+import sqlite3
+
+# API endpoint URL
+api_url = "https://api.example.com/player_data"
+
+# Your API key
+api_key = "74d6943a-6c9f-4db4-86b7-b75101d5a8ca"
+
+# Database connection
+conn = sqlite3.connect("player_data.db")
+cursor = conn.cursor()
+
+# Create the table if it doesn't exist
+cursor.execute("""
+    CREATE TABLE IF NOT EXISTS player_data (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        username TEXT NOT NULL,
+        platform TEXT NOT NULL,
+        rank_2s INTEGER,
+        rank_3s INTEGER
+    )
+""")
+conn.commit()
+
+# Make the API request with the API key included in the headers
+headers = {
+    "Authorization": f"Bearer {api_key}"
+}
+response = requests.get(api_url, headers=headers)
+
+if response.status_code == 200:
+    data = response.json()
+
+    # Iterate through the API data and insert it into the database
+    for entry in data:
+        username = entry["username"]
+        platform = entry["platform"]
+        rank_2s = entry["rank_2s"]
+        rank_3s = entry["rank_3s"]
+
+        # Insert the data into the database
+        cursor.execute("""
+            INSERT INTO player_data (username, platform, rank_2s, rank_3s)
+            VALUES (?, ?, ?, ?)
+        """, (username, platform, rank_2s, rank_3s))
+        conn.commit()
+
+    print("Data successfully fetched and stored in the database.")
+
+else:
+    print(f"Failed to fetch data from the API. Status code: {response.status_code}")
+
+# Close the database connection
+conn.close()
